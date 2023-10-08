@@ -3,14 +3,18 @@ import {
     ChangeEvent,
     ReactElement,
     useCallback,
-    useEffect,
+    useEffect, useLayoutEffect,
     useState,
 } from 'react';
 import dateUtil from '../utils/dateUtil';
 import React from 'react';
+import Spinner from "./Spinner";
+import BoardInput from "./BoardInput";
 
 const BOTTOM_SIZE = 5;
+const PAGE_SIZE_MULTIPLE_VALUE = 5;
 export default function BoardForm() {
+    const [loading, setLoading] = useState<boolean>(false);
     const ajax = useFetch();
     const [data, setData] = useState<BoardInfo[]>([]);
     const [pagination, setPagination] = useState<Pagination>({
@@ -44,7 +48,7 @@ export default function BoardForm() {
     }, [pagination.page, pagination.pageSize]);
     const handlePrev = () => {
         setPagination((prev) => {
-            let prevPage = (prev.page || 1) - 10;
+            let prevPage = (prev.page || 1) - BOTTOM_SIZE;
             if (prevPage < 1) prevPage = 1;
             return {
                 ...prev,
@@ -54,7 +58,7 @@ export default function BoardForm() {
     };
     const handleNext = () => {
         setPagination((prev) => {
-            let nextPage = (prev.page || 1) + 10;
+            let nextPage = (prev.page || 1) + BOTTOM_SIZE;
             if (nextPage > prev.totalPage) nextPage = prev.totalPage;
             return {
                 ...prev,
@@ -70,14 +74,17 @@ export default function BoardForm() {
             };
         });
     };
-    const handleOptionChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const handleOptionChange = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
+        let pageSize = Number(e.target.value);
+        if(isNaN(pageSize)) return;
         setPagination((prev: Pagination) => {
             return {
                 ...prev,
-                pageSize: Number(e.target.value),
+                page: 1,
+                pageSize,
             };
         });
-    }
+    },[])
 
     const renderPages = useCallback(() => {
         const { page, totalPage } = pagination;
@@ -87,47 +94,67 @@ export default function BoardForm() {
         const jsx: ReactElement[] = [];
         for (let i = firstNumber; i <= lastNumber; i++) {
             jsx.push(
-                <li key={i}
+                <li
+                    key={i}
                     onClick={() => handleClickPages(i)}
-                    className={'float-left space-x-3'}>
+                    className={'float-left space-x-3 cursor-pointer'}
+                >
                     {i}
-                </li>
+                </li>,
             );
         }
         return jsx;
     }, [pagination]);
-    const renderOptions = useCallback(()=>{
-        return [...new Array(6)].map((v,i)=>{
-            return (
-                <option value={(i+1) * 5}>{(i+1)*5}</option>
-            )
-        })
-    },[])
+    const renderOptions = useCallback(() => {
+        return [...new Array(6)].map((v, i) => {
+            return <option value={(i + 1) * PAGE_SIZE_MULTIPLE_VALUE}>{(i + 1) * PAGE_SIZE_MULTIPLE_VALUE}</option>;
+        });
+    }, []);
+    if(loading) return <Spinner/>
     return (
         <>
-            <select onChange={handleOptionChange}>
-                {renderOptions()}
-            </select>
-            <div className={'container mx-auto '}>
+            <div className={'container mx-auto'}>
+                <div className={'flex items-baseline'}>
+                    <BoardInput />
+                    <select className={'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'}
+                        onChange={handleOptionChange}
+                    >
+                        <option selected>선택</option>
+                        {renderOptions()}
+                    </select>
+                </div>
                 {data.map((row) => {
                     const { years, months, days, hours, minutes } =
                         dateUtil.parseDate(row.biChanged);
                     return (
-                        <React.Fragment key={row.biNum}>
-                            <div>No.{row.biNum}</div>
-                            <div>{row.biId}</div>
-                            <div>{row.biContent}</div>
-                            <div>{`${years}년 ${months}월 ${days}일 ${hours}시 ${minutes}분`}</div>
-                        </React.Fragment>
+                        <div
+                            className={
+                                'bg-gray-800 text-white py-2 px-4'
+                            }
+                            key={row.biNum}
+                        >
+                            <div className={'text-left py-3 px-4'}>
+                                #{row.biNum}
+                            </div>
+                            <div className={'text-left py-3 px-4'}>
+                                ID : {row.biId}
+                            </div>
+                            <div className={'text-left py-3 px-4'}>
+                                &gt; {row.biContent}
+                            </div>
+                            <div
+                                className={'text-left py-3 px-4'}
+                            >{`${years}년 ${months}월 ${days}일 ${hours}시 ${minutes}분`}</div>
+                        </div>
                     );
                 })}
             </div>
             <ul className={'mx-auto'}>
-                <li className={'float-left space-x-3'} onClick={handlePrev}>
+                <li className={'cursor-pointer'} onClick={handlePrev}>
                     뒤로
                 </li>
                 {renderPages()}
-                <li className={'float-left space-x-3'} onClick={handleNext}>
+                <li className={'cursor-pointer'} onClick={handleNext}>
                     앞으로
                 </li>
             </ul>

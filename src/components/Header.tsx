@@ -3,14 +3,13 @@ import {useSelector} from "react-redux";
 import {Link, useNavigate} from "react-router-dom";
 
 export default function Header() {
-    const [isLoggedIn, setIsLoggedIn] = useState<Boolean>(
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(
         localStorage.getItem('key') !== null
     );
     const navigate = useNavigate();
     const handleSignOut = () => {
         localStorage.removeItem('key');
-        localStorage.removeItem('info');
-        window.location.reload();
+        window.location.replace(window.location.href);
     }
     const renderByLoggedIn = (): ReactElement => {
         const commonProps = { className: "hover:text-gray-300" };
@@ -32,7 +31,7 @@ export default function Header() {
         );
     };
     return (
-        <div className="bg-blue-500 text-white">
+        <div className="bg-black text-white top-0 sticky z-10 w-full">
             <div className="container mx-auto flex justify-between p-4">
                 <div className="font-bold text-lg space-x-3">
                     <Link to={'/'}>메인</Link>

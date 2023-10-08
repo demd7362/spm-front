@@ -1,11 +1,9 @@
 import BoardForm from "../components/BoardForm";
-import WriteBoard from "../components/WriteBoard";
+import BoardInput from "../components/BoardInput";
+import {useState} from "react";
 
 export default function Board(){
     return (
-        <>
-            <WriteBoard/>
-            <BoardForm/>
-        </>
+        <BoardForm/>
     );
 }
