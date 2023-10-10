@@ -4,6 +4,7 @@ import {Provider} from "react-redux";
 import authStore from "./stores/authStore";
 
 export default function App() {
+
     return (
         <Provider store={authStore}>
             <AppRouter />

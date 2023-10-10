@@ -13,22 +13,14 @@ export default function Header() {
     }
     const renderByLoggedIn = (): ReactElement => {
         const commonProps = { className: "hover:text-gray-300" };
-
+        const loggingElement = isLoggedIn ? <Link {...commonProps} to={''} onClick={handleSignOut}>로그아웃</Link> : <Link {...commonProps} to={"/sign/in"}>로그인</Link>
         return (
             <>
-                {isLoggedIn ? (
-                    <>
-                        <Link {...commonProps} to={''} onClick={handleSignOut}>로그아웃</Link>
-                        <Link {...commonProps} to={"/sign/up"}>회원가입</Link>
-                    </>
-                ) : (
-                    <>
-                        <Link {...commonProps} to={"/sign/in"}>로그인</Link>
-                        <Link {...commonProps} to={"/sign/up"}>회원가입</Link>
-                    </>
-                )}
+                {loggingElement}
+                <Link {...commonProps} to={"/sign/up"}>회원가입</Link>
             </>
         );
+
     };
     return (
         <div className="bg-black text-white top-0 sticky z-10 w-full">
@@ -36,6 +28,7 @@ export default function Header() {
                 <div className="font-bold text-lg space-x-3">
                     <Link to={'/'}>메인</Link>
                     <Link to={'/board'}>방명록</Link>
+                    <Link to={'/quiz'}>문제</Link>
                 </div>
                 <nav className="space-x-4">
                     {renderByLoggedIn()}

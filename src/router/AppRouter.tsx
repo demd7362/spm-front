@@ -7,6 +7,7 @@ import React from 'react';
 import Search from '../pages/Search';
 import Header from "../components/Header";
 import Board from "../pages/Board";
+import Quiz from "../pages/Quiz";
 
 export default function AppRouter() {
     return (
@@ -15,6 +16,7 @@ export default function AppRouter() {
             <Routes>
                 <Route path={'/'} element={<Main />} />
                 <Route path={'/board'} element={<Board />} />
+                <Route path={'/quiz'} element={<Quiz />} />
                 <Route path={'/sign/in'} element={<SignIn />} />
                 <Route path={'/sign/up'} element={<SignUp />} />
                 <Route path={'*'} element={<NotFound />} />
