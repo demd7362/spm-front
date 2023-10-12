@@ -4,15 +4,14 @@ import SignIn from '../pages/SignIn';
 import SignUp from '../pages/SignUp';
 import NotFound from '../pages/NotFound';
 import React from 'react';
-import Search from '../pages/Search';
-import Header from "../components/Header";
-import Board from "../pages/Board";
-import Quiz from "../pages/Quiz";
+import Header from '../components/Header';
+import Board from '../pages/Board';
+import Quiz from '../pages/Quiz';
 
 export default function AppRouter() {
     return (
         <BrowserRouter>
-            <Header/>
+            <Header />
             <Routes>
                 <Route path={'/'} element={<Main />} />
                 <Route path={'/board'} element={<Board />} />
