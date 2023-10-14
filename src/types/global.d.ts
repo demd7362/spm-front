@@ -49,3 +49,22 @@ type Pagination = {
     offset?: number,
     totalPage: number,
 }
+
+type QuizInfo = {
+    qiNum?: number,
+    qiId: string,
+    qiTitle: string,
+    qiContent: string,
+    qiAnswer: number,
+    qiLevel: number,
+    qiActive: number,
+    qiCreated?: string,
+    qiChanged?: string
+}
+
+type QuizSubmit = {
+    qsNum?:number,
+    qsId:string,
+    qsTry?:number,
+    qsSolved?:number
+}
