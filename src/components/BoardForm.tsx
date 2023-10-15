@@ -13,6 +13,7 @@ import BoardInput from "./BoardInput";
 
 const BOTTOM_SIZE = 5;
 const PAGE_SIZE_MULTIPLE_VALUE = 5;
+
 export default function BoardForm() {
     const [loading, setLoading] = useState<boolean>(false);
     const ajax = useFetch();

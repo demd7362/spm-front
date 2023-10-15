@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { Editor, Monaco } from '@monaco-editor/react';
+import { useQuery } from '@tanstack/react-query';
+import useFetch from '../hooks/useFetch';
 
 export default function Quiz() {
     const editorRef = useRef<Monaco | null>(null);
-    const [quizInfo,setQuizInfo] = useState('');
+    const [quizInfo, setQuizInfo] = useState('');
     const [result, setResult] = useState('');
+    const ajax = useFetch();
     const handleEditorDidMount = (editor: any) => {
         editorRef.current = editor;
     };
@@ -15,13 +18,18 @@ export default function Quiz() {
         const result = new Function(code + `return runtime()`)();
         const end = +new Date();
         const durationTime: number = end - start;
-        console.log(durationTime+'ms');
+        console.log(durationTime + 'ms');
         setResult(result);
     };
     useEffect(() => {
-        if (result) {
-            alert(result);
+        const getQuizInfo = async () => {
+            const {message,status,quizInfoList} = await ajax.get('/quiz/list');
+            console.log(message)
+            console.log(status)
+            console.log(quizInfoList)
+
         }
+        getQuizInfo();
     }, [result]);
 
     return (
@@ -45,8 +53,10 @@ export default function Quiz() {
                     onMount={handleEditorDidMount}
                 />
             </div>
-            <div className={'bg-black w-1/2 text-white text-'} contentEditable={true}>
-            </div>
+            <div
+                className={'bg-black w-1/2 text-white text-'}
+                contentEditable={true}
+            ></div>
         </div>
     );
 }
