@@ -90,21 +90,19 @@ export default function BoardForm() {
     const renderPages = useCallback(() => {
         const { page, totalPage } = pagination;
         const firstNumber = page - (page % BOTTOM_SIZE) + 1;
-        let lastNumber = page - (page % BOTTOM_SIZE) + BOTTOM_SIZE;
-        if (lastNumber > totalPage) lastNumber = totalPage;
-        const jsx: ReactElement[] = [];
-        for (let i = firstNumber; i <= lastNumber; i++) {
-            jsx.push(
+        const lastNumber = Math.min(firstNumber + BOTTOM_SIZE - 1, totalPage);
+        return Array.from({ length: lastNumber - firstNumber + 1 }, (_, index) => {
+            const pageNumber = firstNumber + index;
+            return (
                 <li
-                    key={i}
-                    onClick={() => handleClickPages(i)}
+                    key={pageNumber}
+                    onClick={() => handleClickPages(pageNumber)}
                     className={'float-left space-x-3 cursor-pointer'}
                 >
-                    {i}
-                </li>,
+                    {pageNumber}
+                </li>
             );
-        }
-        return jsx;
+        });
     }, [pagination]);
     const renderOptions = useCallback(() => {
         return [...new Array(6)].map((v, i) => {
@@ -150,15 +148,17 @@ export default function BoardForm() {
                     );
                 })}
             </div>
-            <ul className={'mx-auto'}>
-                <li className={'cursor-pointer'} onClick={handlePrev}>
-                    뒤로
-                </li>
-                {renderPages()}
-                <li className={'cursor-pointer'} onClick={handleNext}>
-                    앞으로
-                </li>
-            </ul>
+            {data.length > 0 &&
+                <ul className={'mx-auto'}>
+                    <li className={'cursor-pointer'} onClick={handlePrev}>
+                        뒤로
+                    </li>
+                    {renderPages()}
+                    <li className={'cursor-pointer'} onClick={handleNext}>
+                        앞으로
+                    </li>
+                </ul>
+            }
         </>
     );
 }
