@@ -23,19 +23,13 @@ export default function useFetch() {
             console.log('url', url);
             console.log('defaultHeaders', defaultHeaders.headers);
             const response = await fetch(PREFIX + url, defaultHeaders);
-            if(response.status === 500){
-                return {
-                    message: '인증되지 않은 사용자입니다.',
-                    status: 500
-                }
-            }
             return await response.json();
         },
         [defaultHeaders]
     );
 
     const post = useCallback(
-        async (url: string, body: object) => {
+        async (url: string, body?: object) => {
             console.log('url', url);
             console.log('defaultHeaders', defaultHeaders.headers);
             console.log('body', body);
@@ -45,16 +39,10 @@ export default function useFetch() {
                 body: JSON.stringify(body),
             });
             console.log('response',response)
-            if(response.status === 500){
-                return {
-                    message: '인증되지 않은 사용자입니다.',
-                    status: 500
-                }
-            }
             return await response.json();
         },
-        [defaultHeaders],
+        [defaultHeaders]
     );
 
-    return { get, post };
+    return { get, post, jwt };
 }

@@ -12,8 +12,12 @@ export default function Main() {
             <div className={'h-screen flex items-center'}>
                 <div className={'container m-auto'}>
                     <div className={'mb-3 flex items-center justify-center'}>
-                        <img src={dog} onClick={async ()=>{
-                            const result = await ajax.get('/auth/info');
+                        <img src={dog} onClick={async ()=> {
+                            const {refreshToken} = ajax.jwt;
+                            console.log(refreshToken)
+                            const result = await ajax.post('/auth/refresh-token',{
+                                refreshToken
+                            });
                             console.log(result)
                         }}/>
                     </div>
