@@ -1,16 +1,11 @@
-import React, {
-    ChangeEvent,
-    FormEvent,
-    KeyboardEventHandler,
-    useState,
-} from 'react';
-import useFetch from '../hooks/useFetch';
+import React, { ChangeEvent, useState } from 'react';
+import useFetch from '../../hooks/useFetch';
 
 export default function BoardInput() {
     const [content, setContent] = useState('');
     const ajax = useFetch();
     const handleSubmit = async () => {
-        if(content.length > 50){
+        if (content.length > 50) {
             alert('글은 50자 이상 적을 수 없습니다.');
             return;
         }

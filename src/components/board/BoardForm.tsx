@@ -1,4 +1,4 @@
-import useFetch from '../hooks/useFetch';
+import useFetch from '../../hooks/useFetch';
 import {
     ChangeEvent,
     ReactElement,
@@ -7,17 +7,17 @@ import {
     useLayoutEffect,
     useState,
 } from 'react';
-import dateUtil from '../utils/dateUtil';
+import dateUtil from '../../utils/dateUtil';
 import React from 'react';
-import Spinner from './Spinner';
+import Spinner from '../common/Spinner';
 import BoardInput from './BoardInput';
+import Pagination from "../common/Pagination";
 
 const BOTTOM_SIZE = 5;
 const PAGE_SIZE_MULTIPLE_VALUE = 5;
 
 export default function BoardForm() {
     const [loading, setLoading] = useState<boolean>(false);
-    const [boldPage,setBoldPage] = useState<number>(1);
     const ajax = useFetch();
     const [data, setData] = useState<BoardInfo[]>([]);
     const [pagination, setPagination] = useState<Pagination>({
@@ -26,11 +26,10 @@ export default function BoardForm() {
         totalPage: 1,
     });
     useEffect(() => {
-        const getBoardData = async () => {
-            const result = await ajax.get(
-                `/board/list/${pagination.page}/${pagination.pageSize}`,
-            );
-            const { status, message, boardInfoList } = result;
+        ajax.get(
+            `/board/list/${pagination.page}/${pagination.pageSize}`,
+        ).then(data => {
+            const { status, message, boardInfoList } = data;
             switch (status) {
                 case 200:
                     setData(boardInfoList);
@@ -46,8 +45,10 @@ export default function BoardForm() {
                 default:
                     alert(message);
             }
-        };
-        getBoardData();
+        })
+
+
+
     }, [pagination.page, pagination.pageSize]);
     const handlePrev = () => {
         setPagination((prev) => {
@@ -55,8 +56,6 @@ export default function BoardForm() {
             const page = Math.max(prevPage - BOTTOM_SIZE, 1);
             const firstNumber = Math.floor((page - 1) / BOTTOM_SIZE) * BOTTOM_SIZE + 1;
             const lastNumber = Math.min(firstNumber + BOTTOM_SIZE - 1, totalPage);
-            console.log(page,firstNumber,lastNumber)
-            console.log('prevPage',prevPage)
             const currentPage = Math.floor(Math.max((prevPage - 1),1) / BOTTOM_SIZE ) === 0 ? 1 : lastNumber;
             return {
                 ...prev,
@@ -101,29 +100,6 @@ export default function BoardForm() {
         [],
     );
 
-    const renderPages = useCallback(() => {
-        const { page, totalPage } = pagination;
-        // 1 2 3 4 5 가 있을 때 5를 누르면 firstNumber가 6이 되지 않게끔 해준다
-        const firstNumber = Math.floor((page - 1) / BOTTOM_SIZE) * BOTTOM_SIZE + 1;
-        const lastNumber = Math.min(firstNumber + BOTTOM_SIZE - 1, totalPage);
-        console.log('page',page)
-        console.log('firstNumber',firstNumber)
-        console.log('lastNumber',lastNumber)
-        return Array.from({ length: lastNumber - firstNumber + 1 }, (_, index) => {
-            const pageNumber = firstNumber + index;
-            return (
-                <li
-                    key={pageNumber}
-                    onClick={() => {
-                        handleClickPage(pageNumber);
-                    }}
-                    className={`hover:text-gray-300 ${pageNumber === page ? 'font-bold' : ''}`}
-                >
-                    {pageNumber}
-                </li>
-            );
-        });
-    }, [pagination]);
     const renderOptions = useCallback(() => {
         return [...new Array(6)].map((_, index) => {
             return (
@@ -176,15 +152,15 @@ export default function BoardForm() {
             </div>
             <div className={'container mx-auto py-2'}>
                 {data.length > 0 && (
-                    <ul className={'cursor-pointer flex justify-center mx-auto space-x-5'}>
-                        <li className={'hover:text-gray-300'} onClick={handlePrev}>
-                            뒤로
-                        </li>
-                        {renderPages()}
-                        <li className={'hover:text-gray-300'} onClick={handleNext}>
-                            앞으로
-                        </li>
-                    </ul>
+                    <Pagination
+                        pagination={pagination}
+                        handlePrev={handlePrev}
+                        handleNext={handleNext}
+                        handleClickPage={handleClickPage}
+                        prevText={'이전'}
+                        nextText={'다음'}
+                        bottomSize={BOTTOM_SIZE}
+                    />
                 )}
             </div>
         </>

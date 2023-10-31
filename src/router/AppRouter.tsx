@@ -4,7 +4,7 @@ import SignIn from '../pages/SignIn';
 import SignUp from '../pages/SignUp';
 import NotFound from '../pages/NotFound';
 import React from 'react';
-import Header from '../components/Header';
+import Header from '../components/common/Header';
 import Board from '../pages/Board';
 import Quiz from '../pages/Quiz';
 
