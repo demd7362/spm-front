@@ -17,6 +17,7 @@ const PAGE_SIZE_MULTIPLE_VALUE = 5;
 
 export default function BoardForm() {
     const [loading, setLoading] = useState<boolean>(false);
+    const [boldPage,setBoldPage] = useState<number>(1);
     const ajax = useFetch();
     const [data, setData] = useState<BoardInfo[]>([]);
     const [pagination, setPagination] = useState<Pagination>({
@@ -113,8 +114,10 @@ export default function BoardForm() {
             return (
                 <li
                     key={pageNumber}
-                    onClick={() => handleClickPage(pageNumber)}
-                    className={'float-left space-x-3 cursor-pointer'}
+                    onClick={() => {
+                        handleClickPage(pageNumber);
+                    }}
+                    className={`hover:text-gray-300 ${pageNumber === page ? 'font-bold' : ''}`}
                 >
                     {pageNumber}
                 </li>
@@ -171,17 +174,19 @@ export default function BoardForm() {
                     );
                 })}
             </div>
-            {data.length > 0 && (
-                <ul className={'mx-auto'}>
-                    <li className={'cursor-pointer'} onClick={handlePrev}>
-                        뒤로
-                    </li>
-                    {renderPages()}
-                    <li className={'cursor-pointer'} onClick={handleNext}>
-                        앞으로
-                    </li>
-                </ul>
-            )}
+            <div className={'container mx-auto py-2'}>
+                {data.length > 0 && (
+                    <ul className={'cursor-pointer flex justify-center mx-auto space-x-5'}>
+                        <li className={'hover:text-gray-300'} onClick={handlePrev}>
+                            뒤로
+                        </li>
+                        {renderPages()}
+                        <li className={'hover:text-gray-300'} onClick={handleNext}>
+                            앞으로
+                        </li>
+                    </ul>
+                )}
+            </div>
         </>
     );
 }
