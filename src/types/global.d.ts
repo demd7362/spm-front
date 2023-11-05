@@ -73,7 +73,19 @@ type PaginationProps = {
     handlePrev: () => void;
     handleNext: () => void;
     handleClickPage: (page: number) => void;
-    prevText: string;
-    nextText: string;
+    prevText?: string;
+    nextText?: string;
     bottomSize: number;
+}
+
+type UseModalProps = {
+    title: string;
+    content: string;
+    isOpen?: boolean;
+    closeText?: string;
+}
+
+type ModalProps = {
+    props: UseModalProps;
+    onClose: () => void;
 }
