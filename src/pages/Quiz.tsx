@@ -7,7 +7,7 @@ export default function Quiz() {
     const editorRef = useRef<Monaco | null>(null);
     const [quizInfo, setQuizInfo] = useState('');
     const [result, setResult] = useState('');
-    const ajax = useFetch();
+    const fetch = useFetch();
     const handleEditorDidMount = (editor: any) => {
         editorRef.current = editor;
     };
@@ -23,7 +23,7 @@ export default function Quiz() {
     };
     useEffect(() => {
         const getQuizInfo = async () => {
-            const {message,status,quizInfoList} = await ajax.get('/quiz/list');
+            const {message,status,quizInfoList} = await fetch.get('/quiz/list');
             console.log(message)
             console.log(status)
             console.log(quizInfoList)

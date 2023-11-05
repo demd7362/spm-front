@@ -1,40 +1,36 @@
 import useFetch from '../../hooks/useFetch';
-import {
-    ChangeEvent,
-    ReactElement,
-    useCallback,
-    useEffect,
-    useLayoutEffect,
-    useState,
-} from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import dateUtil from '../../utils/dateUtil';
-import React from 'react';
 import Spinner from '../common/Spinner';
 import BoardInput from './BoardInput';
-import Pagination from "../common/Pagination";
+import Pagination from '../common/Pagination';
+import useModal from "../../hooks/useModal";
+import Modal from "../common/Modal";
 
 const BOTTOM_SIZE = 5;
 const PAGE_SIZE_MULTIPLE_VALUE = 5;
 
 export default function BoardForm() {
+    const modal = useModal();
     const [loading, setLoading] = useState<boolean>(false);
-    const ajax = useFetch();
+    const fetch = useFetch();
     const [data, setData] = useState<BoardInfo[]>([]);
     const [pagination, setPagination] = useState<Pagination>({
         page: 1,
         pageSize: 5,
         totalPage: 1,
     });
+
     useEffect(() => {
-        ajax.get(
+        fetch.get(
             `/board/list/${pagination.page}/${pagination.pageSize}`,
-        ).then(data => {
-            const { status, message, boardInfoList } = data;
+        ).then(result => {
+            const { status, text, data, message } = result;
             switch (status) {
                 case 200:
-                    setData(boardInfoList);
-                    if (boardInfoList.length > 0) {
-                        const { page, pageSize, totalPage } = boardInfoList[0];
+                    setData(data);
+                    if (data.length > 0) {
+                        const { page, pageSize, totalPage } = data[0];
                         setPagination({
                             pageSize,
                             totalPage,
@@ -43,7 +39,7 @@ export default function BoardForm() {
                     }
                     break;
                 default:
-                    alert(message);
+                    modal.setAuto(message,text);
             }
         })
 
@@ -114,6 +110,7 @@ export default function BoardForm() {
     if (loading) return <Spinner />;
     return (
         <>
+            <Modal props={modal.props} onClose={modal.close}/>
             <div className={'container mx-auto'}>
                 <div className={'flex items-baseline'}>
                     <BoardInput />
@@ -157,8 +154,6 @@ export default function BoardForm() {
                         handlePrev={handlePrev}
                         handleNext={handleNext}
                         handleClickPage={handleClickPage}
-                        prevText={'이전'}
-                        nextText={'다음'}
                         bottomSize={BOTTOM_SIZE}
                     />
                 )}

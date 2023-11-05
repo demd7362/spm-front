@@ -1,10 +1,9 @@
 import {useEffect, useState} from "react";
 
-const useAuthorization = (jwt:Jwt) => {
-    const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
+export default function useAuthorization (jwt:Jwt)  {
+    const [isAuthorized, setAuthorized] = useState<boolean>(false);
     useEffect(()=>{
         // 인증 요청을 하는 코드
     },[])
 }
 
-export default useAuthorization;

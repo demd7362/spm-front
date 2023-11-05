@@ -1,5 +1,5 @@
 
-export default function Pagination({ pagination, handlePrev, handleNext, handleClickPage,prevText,nextText,bottomSize }: PaginationProps){
+export default function Pagination({ pagination, handlePrev, handleNext, handleClickPage,prevText = '이전',nextText = '다음',bottomSize }: PaginationProps){
     const { page, totalPage } = pagination;
 
     const renderPages = () => {

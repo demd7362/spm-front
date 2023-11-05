@@ -3,7 +3,7 @@ import {useSelector} from "react-redux";
 import {Link, useNavigate} from "react-router-dom";
 
 export default function Header() {
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(
+    const [isLoggedIn, setLoggedIn] = useState<boolean>(
         localStorage.getItem('key') !== null
     );
     const navigate = useNavigate();
