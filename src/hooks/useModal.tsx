@@ -1,7 +1,6 @@
-import React, {useCallback, useContext, useState} from 'react';
-import {ModalContext} from "../router/AppRouter";
+import React, { useCallback, useState } from 'react';
 
-export default function useModal():ModalReturnProps {
+export default function useModal(): ModalReturnProps {
     const [props, setProps] = useState<UseModalProps>({
         title: '',
         content: '',

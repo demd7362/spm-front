@@ -8,6 +8,7 @@ type ModalProps = {
 export default function Modal ({props, onClose} : ModalProps) {
     // @ts-ignore
     const {title,content,closeText = '확인' ,isOpen } = props;
+    debugger
     if (!isOpen) return null;
 
     return (

@@ -22,10 +22,10 @@ const defaultValue:ModalReturnProps = {
 export const ModalContext = createContext<ModalReturnProps>(defaultValue);
 export default function AppRouter() {
     const modal = useModal();
-    // const modalProviderValue = useMemo(() => ({...modal}), [modal]);
+    const modalProviderValue = useMemo(() => ({...modal}), [modal]);
     return (
         <BrowserRouter>
-            <ModalContext.Provider value={modal}>
+            <ModalContext.Provider value={modalProviderValue}>
                 <Modal props={modal.props} onClose={modal.close}/>
                 <Header />
                 <Routes>

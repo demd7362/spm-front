@@ -1,10 +1,10 @@
-import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
-import useModal from "./useModal";
+import { useCallback, useContext, useMemo, useState } from 'react';
+import { ModalContext } from '../router/AppRouter';
 
 const PREFIX = process.env.REACT_APP_API_URL;
 
 export default function useFetch() {
-    const modal = useModal();
+    const modal = useContext(ModalContext);
     const [jwt, setJwt] = useState<Jwt>((): Jwt => {
         const key = sessionStorage.getItem('key') || '{}';
         return JSON.parse(key);
