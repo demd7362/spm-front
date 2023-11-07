@@ -1,13 +1,14 @@
-import React, { FormEvent, useState } from 'react';
+import React, {FormEvent, useContext, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import useFetch from '../../hooks/useFetch';
 import useModal from "../../hooks/useModal";
 import Modal from "../common/Modal";
+import {ModalContext} from "../../router/AppRouter";
 
 export default function SignUpForm() {
     const navigate = useNavigate();
     const fetch = useFetch();
-    const modal = useModal();
+    const modal = useContext(ModalContext);
     const [formData, setFormData] = useState<UserForm>({
         id: '',
         password: '',
@@ -30,21 +31,15 @@ export default function SignUpForm() {
             id,
             password,
         };
-        const result = await fetch.post('/auth/sign-up', data);
-        console.log(result)
+        const result:FetchResult = await fetch.post('/auth/sign-up', data);
         const { text, status, message } = result;
-        switch (status) {
-            case 200:
-                navigate('/sign/in');
-                break;
-            default:
-                modal.setAuto(message,text);
-        }
+        fetch.handler(result,()=>{
+            navigate('/sign/in');
+        })
     };
 
     return (
         <>
-            <Modal props={modal.props} onClose={modal.close}/>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <label className="block text-sm font-bold" htmlFor="username">

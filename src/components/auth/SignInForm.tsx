@@ -1,16 +1,15 @@
-import React, { FormEvent, useState } from 'react';
+import React, { FormEvent, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import authSlice from '../../slices/authSlice';
 import useFetch from '../../hooks/useFetch';
-import useModal from "../../hooks/useModal";
-import Modal from "../common/Modal";
+import { ModalContext } from '../../router/AppRouter';
 
 export default function SignInForm() {
     const navigate = useNavigate();
+    const modal = useContext(ModalContext);
     const dispatch = useDispatch();
     const fetch = useFetch();
-    const modal = useModal();
     const [formData, setFormData] = useState<User>({
         id: '',
         password: '',
@@ -28,27 +27,25 @@ export default function SignInForm() {
             id,
             password,
         };
-        const result = await fetch.post('/auth/sign-in', body);
+        const result: FetchResult = await fetch.post('/auth/sign-in', body);
         const { text, status, data, message } = result;
-        switch (status) {
-            case 200:
-                localStorage.setItem('key', JSON.stringify(data));
-                localStorage.setItem('name',id);
-                dispatch(authSlice.actions.set(data));
-                navigate('/');
-                window.location.reload();
-                break;
-            default:
-                modal.setAuto(message,text);
-        }
+        fetch.handler(result, () => {
+            sessionStorage.setItem('key', JSON.stringify(data));
+            sessionStorage.setItem('name', id);
+            dispatch(authSlice.actions.set(data));
+            navigate('/');
+            window.location.reload();
+        });
     };
 
     return (
         <>
-            <Modal props={modal.props} onClose={modal.close}/>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label className="block text-sm font-bold" htmlFor="username">
+                    <label
+                        className="block text-sm font-bold"
+                        htmlFor="username"
+                    >
                         {' '}
                         Username{' '}
                     </label>
@@ -63,7 +60,10 @@ export default function SignInForm() {
                 </div>
 
                 <div>
-                    <label className="block text-sm font-bold" htmlFor="password">
+                    <label
+                        className="block text-sm font-bold"
+                        htmlFor="password"
+                    >
                         Password
                     </label>
                     <input

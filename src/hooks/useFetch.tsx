@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
+import useModal from "./useModal";
 
 const PREFIX = process.env.REACT_APP_API_URL;
 
-
 export default function useFetch() {
+    const modal = useModal();
     const [jwt, setJwt] = useState<Jwt>((): Jwt => {
-        const key = localStorage.getItem('key') || '{}';
+        const key = sessionStorage.getItem('key') || '{}';
         return JSON.parse(key);
     });
     const defaultHeaders = useMemo(
@@ -25,7 +26,7 @@ export default function useFetch() {
             const response = await fetch(PREFIX + url, defaultHeaders);
             return await response.json();
         },
-        [defaultHeaders]
+        [defaultHeaders],
     );
 
     const post = useCallback(
@@ -38,11 +39,25 @@ export default function useFetch() {
                 method: 'POST',
                 body: JSON.stringify(body),
             });
-            console.log('response',response)
+            console.log('response', response);
             return await response.json();
         },
-        [defaultHeaders]
+        [defaultHeaders],
     );
 
-    return { get, post, jwt };
+    const handler = useCallback(
+        (
+            { text, status, message, response, data }: FetchResult,
+            callback?: () => void | null,
+        ) => {
+            if (status === 200 && callback) {
+                callback();
+            } else {
+                modal.setAuto(message,text);
+            }
+        },
+        [],
+    );
+
+    return { get, post, jwt, handler };
 }

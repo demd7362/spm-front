@@ -1,6 +1,7 @@
-import React, { useCallback, useState } from 'react';
+import React, {useCallback, useContext, useState} from 'react';
+import {ModalContext} from "../router/AppRouter";
 
-export default function useModal() {
+export default function useModal():ModalReturnProps {
     const [props, setProps] = useState<UseModalProps>({
         title: '',
         content: '',
@@ -8,32 +9,26 @@ export default function useModal() {
     });
 
     const open = useCallback(() => {
-        setProps((prev) => {
-            return {
-                ...prev,
-                isOpen: true,
-            };
-        });
+        setProps((prev) => ({
+            ...prev,
+            isOpen: true,
+        }));
     }, []);
 
     const close = useCallback(() => {
-        setProps((prev) => {
-            return {
-                ...prev,
-                isOpen: false,
-            };
-        });
+        setProps((prev) => ({
+            ...prev,
+            isOpen: false,
+        }));
     }, []);
 
     const setAuto = useCallback((title: string, content: string) => {
-        setProps((prev) => {
-            return {
-                ...prev,
-                title,
-                content,
-                isOpen: true,
-            };
-        });
+        setProps((prev) => ({
+            ...prev,
+            title,
+            content,
+            isOpen: true,
+        }));
     }, []);
 
     return {

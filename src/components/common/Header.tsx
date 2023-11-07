@@ -4,11 +4,11 @@ import {Link, useNavigate} from "react-router-dom";
 
 export default function Header() {
     const [isLoggedIn, setLoggedIn] = useState<boolean>(
-        localStorage.getItem('key') !== null
+        sessionStorage.getItem('key') !== null
     );
     const navigate = useNavigate();
     const handleSignOut = () => {
-        localStorage.removeItem('key');
+        sessionStorage.removeItem('key');
         window.location.replace(window.location.href);
     }
     const renderByLoggedIn = (): ReactElement => {

@@ -15,7 +15,7 @@ export default function Main() {
                         <img src={dog} onClick={async ()=> {
                             const {refreshToken} = fetch.jwt;
                             console.log(refreshToken)
-                            const result = await fetch.get('/auth/info');
+                            const result:FetchResult = await fetch.get('/auth/info');
                             console.log(result)
                         }}/>
                     </div>

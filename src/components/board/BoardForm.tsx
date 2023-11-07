@@ -4,48 +4,41 @@ import dateUtil from '../../utils/dateUtil';
 import Spinner from '../common/Spinner';
 import BoardInput from './BoardInput';
 import Pagination from '../common/Pagination';
-import useModal from "../../hooks/useModal";
-import Modal from "../common/Modal";
 
 const BOTTOM_SIZE = 5;
 const PAGE_SIZE_MULTIPLE_VALUE = 5;
 
 export default function BoardForm() {
-    const modal = useModal();
+    // const modal = useModal();
     const [loading, setLoading] = useState<boolean>(false);
+    const [renderTrigger,setRenderTrigger] = useState<number>(0);
     const fetch = useFetch();
     const [data, setData] = useState<BoardInfo[]>([]);
-    const [pagination, setPagination] = useState<Pagination>({
+    const [pagination, setPagination] = useState<Paginations>({
         page: 1,
         pageSize: 5,
         totalPage: 1,
     });
+
 
     useEffect(() => {
         fetch.get(
             `/board/list/${pagination.page}/${pagination.pageSize}`,
         ).then(result => {
             const { status, text, data, message } = result;
-            switch (status) {
-                case 200:
-                    setData(data);
-                    if (data.length > 0) {
-                        const { page, pageSize, totalPage } = data[0];
-                        setPagination({
-                            pageSize,
-                            totalPage,
-                            page,
-                        });
-                    }
-                    break;
-                default:
-                    modal.setAuto(message,text);
-            }
+            fetch.handler(result,()=>{
+                setData(data);
+                if (data.length > 0) {
+                    const { page, pageSize, totalPage } = data[0];
+                    setPagination({
+                        pageSize,
+                        totalPage,
+                        page,
+                    });
+                }
+            })
         })
-
-
-
-    }, [pagination.page, pagination.pageSize]);
+    }, [pagination.page, pagination.pageSize,renderTrigger]);
     const handlePrev = () => {
         setPagination((prev) => {
             const { page:prevPage, totalPage } = prev;
@@ -85,7 +78,7 @@ export default function BoardForm() {
         (e: ChangeEvent<HTMLSelectElement>) => {
             const pageSize = Number(e.target.value);
             if (isNaN(pageSize)) return;
-            setPagination((prev: Pagination) => {
+            setPagination((prev: Paginations) => {
                 return {
                     ...prev,
                     page: 1,
@@ -110,10 +103,9 @@ export default function BoardForm() {
     if (loading) return <Spinner />;
     return (
         <>
-            <Modal props={modal.props} onClose={modal.close}/>
             <div className={'container mx-auto'}>
                 <div className={'flex items-baseline'}>
-                    <BoardInput />
+                    <BoardInput setRenderTrigger={setRenderTrigger}/>
                     <select
                         className={
                             'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'

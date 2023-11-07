@@ -1,28 +1,28 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, {ChangeEvent, Dispatch, SetStateAction, useContext, useState} from 'react';
 import useFetch from '../../hooks/useFetch';
-import useModal from "../../hooks/useModal";
-import Modal from "../common/Modal";
+import { ModalContext } from '../../router/AppRouter';
 
-export default function BoardInput() {
+type BoardInputProps = {
+    setRenderTrigger: Dispatch<SetStateAction<number>>
+}
+export default function BoardInput({setRenderTrigger} : BoardInputProps) {
     const [content, setContent] = useState('');
     const fetch = useFetch();
-    const modal = useModal();
+    const modal = useContext(ModalContext);
     const handleSubmit = async () => {
         if (content.length > 50) {
-            modal.setAuto('글은 50자를 초과하여 작성할 수 없습니다.',`현재 글자 수 ${content.length}자리`);
+            modal.setAuto(
+                '글은 50자를 초과하여 작성할 수 없습니다.',
+                `현재 글자 수 ${content.length}자리`,
+            );
             return;
         }
-        const result = await fetch.post('/board/insert', {
+        const result: FetchResult = await fetch.post('/board/insert', {
             biContent: content,
         });
-        const { text, status, message } = result;
-        switch (status) {
-            case 200:
-                window.location.reload();
-                break;
-            default:
-                modal.setAuto(message,text);
-        }
+        fetch.handler(result, () => {
+            setRenderTrigger(prev => prev + 1);
+        });
     };
     const handleKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
@@ -34,8 +34,9 @@ export default function BoardInput() {
     };
     return (
         <>
-            <Modal props={modal.props} onClose={modal.close}/>
-            <div className={'container mx-auto flex py-2 items-center space-x-3'}>
+            <div
+                className={'container mx-auto flex py-2 items-center space-x-3'}
+            >
                 <div>
                     <input
                         onChange={handleInputChange}

@@ -1,7 +1,13 @@
+import {MouseEventHandler} from "react";
 
+type ModalProps = {
+    props: UseModalProps | undefined;
+    onClose: MouseEventHandler | undefined;
+};
 
 export default function Modal ({props, onClose} : ModalProps) {
-    const {title,content,closeText = '확인' ,isOpen} = props;
+    // @ts-ignore
+    const {title,content,closeText = '확인' ,isOpen } = props;
     if (!isOpen) return null;
 
     return (
