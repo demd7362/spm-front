@@ -21,14 +21,18 @@ export default function useModal(): ModalReturnProps {
         }));
     }, []);
 
-    const setAuto = useCallback((title: string, content: string) => {
-        setProps((prev) => ({
-            ...prev,
-            title,
-            content,
-            isOpen: true,
-        }));
-    }, []);
+    const setAuto = useCallback(
+        (title: string, content: string, onClose?: () => void) => {
+            setProps((prev) => ({
+                ...prev,
+                title,
+                content,
+                isOpen: true,
+                onClose,
+            }));
+        },
+        [],
+    );
 
     return {
         props,

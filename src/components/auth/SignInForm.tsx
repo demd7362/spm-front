@@ -29,7 +29,7 @@ export default function SignInForm() {
         };
         const result: FetchResult = await fetch.post('/auth/sign-in', body);
         const { text, status, data, message } = result;
-        fetch.handler(result, () => {
+        fetch.resultHandler(result, () => {
             sessionStorage.setItem('key', JSON.stringify(data));
             sessionStorage.setItem('name', id);
             dispatch(authSlice.actions.set(data));

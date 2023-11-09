@@ -3,22 +3,23 @@ import Main from '../pages/Main';
 import SignIn from '../pages/SignIn';
 import SignUp from '../pages/SignUp';
 import NotFound from '../pages/NotFound';
-import React, {createContext, Dispatch, MouseEventHandler, useMemo} from 'react';
+import React, {createContext, useMemo} from 'react';
 import Header from '../components/common/Header';
 import Board from '../pages/Board';
 import Quiz from '../pages/Quiz';
 import Modal from '../components/common/Modal';
 import useModal from '../hooks/useModal';
-const defaultValue:ModalReturnProps = {
+
+const defaultValue: ModalReturnProps = {
     props: {
         title: '',
-        content: ''
+        content: '',
     },
-    setProps: ()=> {},
+    setProps: () => {},
     open: () => {},
-    close: ()=> {},
-    setAuto: (arg1,arg2) => {}
-}
+    close: () => {},
+    setAuto: (arg1, arg2) => {},
+};
 export const ModalContext = createContext<ModalReturnProps>(defaultValue);
 export default function AppRouter() {
     const modal = useModal();
@@ -26,7 +27,7 @@ export default function AppRouter() {
     return (
         <BrowserRouter>
             <ModalContext.Provider value={modalProviderValue}>
-                <Modal props={modal.props} onClose={modal.close}/>
+                <Modal {...modalProviderValue.props}/>
                 <Header />
                 <Routes>
                     <Route path={'/'} element={<Main />} />

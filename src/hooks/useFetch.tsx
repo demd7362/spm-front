@@ -1,10 +1,12 @@
 import { useCallback, useContext, useMemo, useState } from 'react';
 import { ModalContext } from '../router/AppRouter';
+import { useNavigate } from 'react-router-dom';
 
 const PREFIX = process.env.REACT_APP_API_URL;
 
 export default function useFetch() {
     const modal = useContext(ModalContext);
+    const navigate = useNavigate();
     const [jwt, setJwt] = useState<Jwt>((): Jwt => {
         const key = sessionStorage.getItem('key') || '{}';
         return JSON.parse(key);
@@ -21,43 +23,53 @@ export default function useFetch() {
 
     const get = useCallback(
         async (url: string) => {
-            console.log('url', url);
-            console.log('defaultHeaders', defaultHeaders.headers);
-            const response = await fetch(PREFIX + url, defaultHeaders);
-            return await response.json();
+            try {
+                const response = await fetch(PREFIX + url, defaultHeaders);
+                return await response.json();
+            } catch (e:any){
+                modal.setAuto('INTERNAL_SERVER_ERROR',e.stack);
+            }
         },
         [defaultHeaders],
     );
 
     const post = useCallback(
         async (url: string, body?: object) => {
-            console.log('url', url);
-            console.log('defaultHeaders', defaultHeaders.headers);
-            console.log('body', body);
-            const response = await fetch(PREFIX + url, {
-                ...defaultHeaders,
-                method: 'POST',
-                body: JSON.stringify(body),
-            });
-            console.log('response', response);
-            return await response.json();
+            try {
+                const response = await fetch(PREFIX + url, {
+                    ...defaultHeaders,
+                    method: 'POST',
+                    body: JSON.stringify(body),
+                });
+                return await response.json();
+            } catch (e:any){
+                modal.setAuto('INTERNAL_SERVER_ERROR',e.stack);
+            }
         },
         [defaultHeaders],
     );
 
-    const handler = useCallback(
+    const resultHandler = useCallback(
         (
             { text, status, message, response, data }: FetchResult,
-            callback?: () => void | null,
+            callback?: (data?:any) => void,
         ) => {
-            if (status === 200 && callback) {
-                callback();
-            } else {
-                modal.setAuto(message,text);
+            switch(status){
+                case 200 :
+                    callback?.(data);
+                    break;
+                case 401 :
+                    modal.setAuto(message,text,()=>{
+                        modal.close();
+                        navigate('/sign/in');
+                    });
+                    break;
+                default :
+                    modal.setAuto(message,text);
             }
         },
-        [],
+        []
     );
 
-    return { get, post, jwt, handler };
+    return { get, post, jwt, resultHandler };
 }

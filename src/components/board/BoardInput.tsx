@@ -20,8 +20,9 @@ export default function BoardInput({setRenderTrigger} : BoardInputProps) {
         const result: FetchResult = await fetch.post('/board/insert', {
             biContent: content,
         });
-        fetch.handler(result, () => {
+        fetch.resultHandler(result, () => {
             setRenderTrigger(prev => prev + 1);
+            setContent('');
         });
     };
     const handleKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {

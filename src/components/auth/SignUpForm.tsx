@@ -33,7 +33,7 @@ export default function SignUpForm() {
         };
         const result:FetchResult = await fetch.post('/auth/sign-up', data);
         const { text, status, message } = result;
-        fetch.handler(result,()=>{
+        fetch.resultHandler(result,()=>{
             navigate('/sign/in');
         })
     };

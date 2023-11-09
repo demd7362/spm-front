@@ -60,7 +60,7 @@ declare global {
         qiId: string;
         qiTitle: string;
         qiContent: string;
-        qiAnswer: number;
+        qiAnswer: string;
         qiLevel: number;
         qiActive: number;
         qiCreated?: string;
@@ -88,6 +88,7 @@ declare global {
         content: string;
         isOpen?: boolean;
         closeText?: string;
+        onClose?: () => void;
     };
 
 
@@ -96,8 +97,8 @@ declare global {
         props: UseModalProps;
         setProps: Dispatch<SetStateAction<UseModalProps>>;
         open: () => void;
-        close: MouseEventHandler;
-        setAuto: (string,string) => void;
+        close: (callback?:()=>void) => void;
+        setAuto: (title: string, content: string, onClose?:() => void) => void;
     };
 }
 

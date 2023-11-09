@@ -26,7 +26,7 @@ export default function BoardForm() {
             `/board/list/${pagination.page}/${pagination.pageSize}`,
         ).then(result => {
             const { status, text, data, message } = result;
-            fetch.handler(result,()=>{
+            fetch.resultHandler(result,()=>{
                 setData(data);
                 if (data.length > 0) {
                     const { page, pageSize, totalPage } = data[0];
