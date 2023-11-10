@@ -65,6 +65,7 @@ declare global {
         qiActive: number;
         qiCreated?: string;
         qiChanged?: string;
+        qiParam: string;
     };
 
     type QuizSubmit = {

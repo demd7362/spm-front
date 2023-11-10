@@ -3,7 +3,7 @@ import { ModalContext } from '../router/AppRouter';
 import { useNavigate } from 'react-router-dom';
 
 const PREFIX = process.env.REACT_APP_API_URL;
-
+const SERVER_ERROR_MESSAGE = 'INTERNAL_SERVER_ERROR';
 export default function useFetch() {
     const modal = useContext(ModalContext);
     const navigate = useNavigate();
@@ -27,7 +27,7 @@ export default function useFetch() {
                 const response = await fetch(PREFIX + url, defaultHeaders);
                 return await response.json();
             } catch (e:any){
-                modal.setAuto('INTERNAL_SERVER_ERROR',e.stack);
+                modal.setAuto(SERVER_ERROR_MESSAGE,e.stack);
             }
         },
         [defaultHeaders],
@@ -43,7 +43,7 @@ export default function useFetch() {
                 });
                 return await response.json();
             } catch (e:any){
-                modal.setAuto('INTERNAL_SERVER_ERROR',e.stack);
+                modal.setAuto(SERVER_ERROR_MESSAGE,e.stack);
             }
         },
         [defaultHeaders],

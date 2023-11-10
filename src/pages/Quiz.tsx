@@ -3,23 +3,15 @@ import { Editor, Monaco } from '@monaco-editor/react';
 import { useQuery } from '@tanstack/react-query';
 import useFetch from '../hooks/useFetch';
 import {ModalContext} from "../router/AppRouter";
+import Spinner from "../components/common/Spinner";
 
 export default function Quiz() {
     const editorRef = useRef<Monaco | null>(null);
-    const [quizInfo, setQuizInfo] = useState<QuizInfo>({
-        qiActive: 1,
-        qiTitle: '',
-        qiLevel: 1,
-        qiId: '',
-        qiNum: 1,
-        qiContent: '',
-        qiAnswer: ''
-    });
-    const [result, setResult] = useState('');
+    const [quizInfo, setQuizInfo] = useState<QuizInfo | null>(null);
     const fetch = useFetch();
     const modal = useContext(ModalContext);
     useEffect(() => {
-        fetch.get(`/quiz/list/${quizInfo.qiNum}`)
+        fetch.get(`/quiz/list/2`)
             .then(result => {
                 fetch.resultHandler(result,(data:QuizInfo)=> {
                     setQuizInfo(data);
@@ -33,29 +25,48 @@ export default function Quiz() {
     };
     const runCode = useCallback(()=>{
         try {
+            if(!quizInfo) return;
             // @ts-ignore
             const code = editorRef.current.getValue();
             const start = +new Date();
-            const result = new Function(code + `return runtime()`)();
+            let result = new Function(code + `return runtime(${quizInfo.qiParam})`)();
+            result = JSON.stringify(result);
             const end = +new Date();
             const durationTime: number = end - start;
-            console.log(durationTime + 'ms');
-            setResult(result);
-            modal.setAuto('RESULT', `Your answer is ${result}\nCode executed in ${durationTime} ms!`);
+            const answer = quizInfo.qiAnswer.replaceAll(' ','');
+            const compareString = (arg1:string,arg2:string) => {
+                arg1 = arg1
+                    .replaceAll(' ','')
+                    .toString();
+                arg2 = arg2
+                    .replaceAll(' ','')
+                    .toString();
+                return arg1 === arg2;
+            }
+            const isCorrect = compareString(result,answer);
+            if(isCorrect) modal.setAuto('정답','축하합니다!');
+            else modal.setAuto('RESULT', `Your return value is '${result}'\nCode executed in ${durationTime} ms!`);
         } catch (e:any) {
             modal.setAuto('SYNTAX_ERROR_HAS_OCCURRED',e.stack);
         }
 
-    },[])
-
-
+    },[quizInfo])
+    const renderQuiz = useCallback(()=>{
+        // @ts-ignore
+        const {qiContent,qiTitle,qiId,qiNum}:QuizInfo = quizInfo;
+        return (
+            <p className={'font-bold text-black whitespace-pre-wrap'}>
+                {`${qiNum}번 문제\n제목 : ${qiTitle}\n출제자 : ${qiId}\n문제 : ${qiContent.split('.').join('.\n')}`}
+            </p>
+        )
+    },[quizInfo])
+    if(quizInfo === null) return <Spinner/>
     return (
         <div className={'flex justify-center h-90vh mt-5'}>
-            <button onClick={runCode}>run</button>
             <div className={'border-black w-1/2'}>
                 <Editor
                     defaultLanguage="javascript"
-                    defaultValue="function runtime(param){ /* 여기에 코드를 작성해주세요. */ }"
+                    defaultValue={`function runtime(param){\n    let answer = [];\n    return answer;\n}`}
                     options={{
                         fontSize: 15,
                         minimap: { enabled: false },
@@ -70,10 +81,9 @@ export default function Quiz() {
                     onMount={handleEditorDidMount}
                 />
             </div>
-            <div
-                className={'w-1/2 '}
-            >
-                <p className={'font-bold text-black whitespace-pre-wrap'}>{quizInfo.qiContent}</p>
+            <div className={'w-1/2'}>
+                <button className={'bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded'} onClick={runCode}>Run code</button>
+                {renderQuiz()}
             </div>
         </div>
     );
