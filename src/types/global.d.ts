@@ -51,7 +51,6 @@ declare global {
     type Paginations = {
         page: number;
         pageSize: number;
-        offset?: number;
         totalPage: number;
     };
 

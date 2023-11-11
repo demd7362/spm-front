@@ -23,15 +23,12 @@ export default function useModal(): ModalReturnProps {
 
     const setAuto = useCallback(
         (title: string, content: string, onClose?: () => void) => {
-            if(onClose === undefined) {
-                onClose = close;
-            }
             setProps((prev) => ({
                 ...prev,
                 title,
                 content,
                 isOpen: true,
-                onClose,
+                onClose : onClose ?? close
             }));
         },
         [],

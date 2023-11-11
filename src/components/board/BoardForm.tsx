@@ -1,31 +1,33 @@
 import useFetch from '../../hooks/useFetch';
-import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
+import React, {ChangeEvent, useCallback, useContext, useEffect, useState} from 'react';
 import dateUtil from '../../utils/dateUtil';
 import Spinner from '../common/Spinner';
 import BoardInput from './BoardInput';
 import Pagination from '../common/Pagination';
+import {useLocation, useSearchParams} from "react-router-dom";
+import {ModalContext} from "../../router/AppRouter";
 
 const BOTTOM_SIZE = 5;
 const PAGE_SIZE_MULTIPLE_VALUE = 5;
 
 export default function BoardForm() {
-    // const modal = useModal();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const modal = useContext(ModalContext);
     const [loading, setLoading] = useState<boolean>(false);
     const [renderTrigger,setRenderTrigger] = useState<number>(0);
     const fetch = useFetch();
     const [data, setData] = useState<BoardInfo[]>([]);
     const [pagination, setPagination] = useState<Paginations>({
-        page: 1,
+        page: Number(searchParams.get('page') || '1'),
         pageSize: 5,
         totalPage: 1,
     });
-
-
     useEffect(() => {
+        console.log('Fetch Effect')
         fetch.get(
             `/board/list/${pagination.page}/${pagination.pageSize}`,
         ).then(result => {
-            const { status, text, data, message } = result;
+            const { text, data, message } = result;
             fetch.resultHandler(result,()=>{
                 setData(data);
                 if (data.length > 0) {
@@ -35,10 +37,13 @@ export default function BoardForm() {
                         totalPage,
                         page,
                     });
+                    setSearchParams({page:page.toString()})
+                } else {
+                    modal.setAuto(message,text);
                 }
             })
         })
-    }, [pagination.page, pagination.pageSize,renderTrigger]);
+    }, [pagination.page,pagination.pageSize,renderTrigger]);
     const handlePrev = () => {
         setPagination((prev) => {
             const { page:prevPage, totalPage } = prev;

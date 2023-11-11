@@ -20,7 +20,7 @@ const defaultValue: ModalReturnProps = {
     close: () => {},
     setAuto: (arg1, arg2) => {},
 };
-export const ModalContext = createContext<ModalReturnProps>(defaultValue);
+export const ModalContext  = createContext<ModalReturnProps>(defaultValue);
 export default function AppRouter() {
     const modal = useModal();
     const modalProviderValue = useMemo(() => ({...modal}), [modal]);

@@ -53,10 +53,10 @@ export default function Quiz() {
     },[quizInfo])
     const renderQuiz = useCallback(()=>{
         // @ts-ignore
-        const {qiContent,qiTitle,qiId,qiNum}:QuizInfo = quizInfo;
+        const {qiContent,qiTitle,qiId,qiNum,qiParam}:QuizInfo = quizInfo;
         return (
             <p className={'font-bold text-black whitespace-pre-wrap'}>
-                {`${qiNum}번 문제\n제목 : ${qiTitle}\n출제자 : ${qiId}\n문제 : ${qiContent.split('.').join('.\n')}`}
+                {`${qiNum}번 문제\n제목 : ${qiTitle}\n출제자 : ${qiId}\n문제 : ${qiContent.split('.').join('.\n')}다음과 같은 파라미터가 주어진다고 가정합니다.\n${qiParam}`}
             </p>
         )
     },[quizInfo])
