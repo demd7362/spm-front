@@ -1,6 +1,6 @@
 import React, {ChangeEvent, Dispatch, SetStateAction, useContext, useState} from 'react';
 import useFetch from '../../hooks/useFetch';
-import { ModalContext } from '../../router/AppRouter';
+import {ContextStorage} from '../../router/AppRouter';
 
 type BoardInputProps = {
     setRenderTrigger: Dispatch<SetStateAction<number>>
@@ -8,7 +8,7 @@ type BoardInputProps = {
 export default function BoardInput({setRenderTrigger} : BoardInputProps) {
     const [content, setContent] = useState('');
     const fetch = useFetch();
-    const modal = useContext(ModalContext);
+    const {modal} = useContext(ContextStorage);
     const handleSubmit = async () => {
         if (content.length > 50) {
             modal.setAuto(

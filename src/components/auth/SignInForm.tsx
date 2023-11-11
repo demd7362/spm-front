@@ -3,11 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import authSlice from '../../slices/authSlice';
 import useFetch from '../../hooks/useFetch';
-import { ModalContext } from '../../router/AppRouter';
 
 export default function SignInForm() {
     const navigate = useNavigate();
-    const modal = useContext(ModalContext);
     const dispatch = useDispatch();
     const fetch = useFetch();
     const [formData, setFormData] = useState<User>({

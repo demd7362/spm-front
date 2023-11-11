@@ -1,14 +1,12 @@
-import React, {FormEvent, useContext, useState} from 'react';
+import React, { FormEvent, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useFetch from '../../hooks/useFetch';
-import useModal from "../../hooks/useModal";
-import Modal from "../common/Modal";
-import {ModalContext} from "../../router/AppRouter";
+import { ContextStorage } from '../../router/AppRouter';
 
 export default function SignUpForm() {
     const navigate = useNavigate();
     const fetch = useFetch();
-    const modal = useContext(ModalContext);
+    const { modal } = useContext(ContextStorage);
     const [formData, setFormData] = useState<UserForm>({
         id: '',
         password: '',
@@ -24,25 +22,28 @@ export default function SignUpForm() {
         e.preventDefault();
         const { id, password, passwordCheck } = formData;
         if (password !== passwordCheck) {
-            modal.setAuto('비밀번호 불일치','동일한 비밀번호를 입력해주세요.');
+            modal.setAuto('비밀번호 불일치', '동일한 비밀번호를 입력해주세요.');
             return;
         }
         const data: User = {
             id,
             password,
         };
-        const result:FetchResult = await fetch.post('/auth/sign-up', data);
+        const result: FetchResult = await fetch.post('/auth/sign-up', data);
         const { text, status, message } = result;
-        fetch.resultHandler(result,()=>{
+        fetch.resultHandler(result, () => {
             navigate('/sign/in');
-        })
+        });
     };
 
     return (
         <>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label className="block text-sm font-bold" htmlFor="username">
+                    <label
+                        className="block text-sm font-bold"
+                        htmlFor="username"
+                    >
                         Username
                     </label>
                     <input
@@ -56,7 +57,10 @@ export default function SignUpForm() {
                 </div>
 
                 <div>
-                    <label className="block text-sm font-bold" htmlFor="password">
+                    <label
+                        className="block text-sm font-bold"
+                        htmlFor="password"
+                    >
                         Password
                     </label>
                     <input
@@ -69,7 +73,10 @@ export default function SignUpForm() {
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-bold" htmlFor="password">
+                    <label
+                        className="block text-sm font-bold"
+                        htmlFor="password"
+                    >
                         Password Check
                     </label>
                     <input

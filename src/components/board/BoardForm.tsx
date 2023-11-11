@@ -1,56 +1,73 @@
 import useFetch from '../../hooks/useFetch';
-import React, {ChangeEvent, useCallback, useContext, useEffect, useState} from 'react';
+import React, {
+    ChangeEvent,
+    Fragment,
+    useCallback,
+    useContext,
+    useEffect,
+    useState,
+} from 'react';
 import dateUtil from '../../utils/dateUtil';
 import Spinner from '../common/Spinner';
-import BoardInput from './BoardInput';
 import Pagination from '../common/Pagination';
-import {useLocation, useSearchParams} from "react-router-dom";
-import {ModalContext} from "../../router/AppRouter";
+import { useNavigate, useParams } from 'react-router-dom';
+import {ContextStorage} from '../../router/AppRouter';
 
 const BOTTOM_SIZE = 5;
 const PAGE_SIZE_MULTIPLE_VALUE = 5;
 
 export default function BoardForm() {
-    const [searchParams, setSearchParams] = useSearchParams();
-    const modal = useContext(ModalContext);
+    const params = useParams();
+    const navigate = useNavigate();
+    const {modal} = useContext(ContextStorage);
     const [loading, setLoading] = useState<boolean>(false);
-    const [renderTrigger,setRenderTrigger] = useState<number>(0);
+    const [renderTrigger, setRenderTrigger] = useState<number>(0);
     const fetch = useFetch();
     const [data, setData] = useState<BoardInfo[]>([]);
     const [pagination, setPagination] = useState<Paginations>({
-        page: Number(searchParams.get('page') || '1'),
+        page: Number(params.page || '1'),
         pageSize: 5,
         totalPage: 1,
     });
     useEffect(() => {
-        console.log('Fetch Effect')
-        fetch.get(
-            `/board/list/${pagination.page}/${pagination.pageSize}`,
-        ).then(result => {
-            const { text, data, message } = result;
-            fetch.resultHandler(result,()=>{
-                setData(data);
-                if (data.length > 0) {
-                    const { page, pageSize, totalPage } = data[0];
-                    setPagination({
-                        pageSize,
-                        totalPage,
-                        page,
-                    });
-                    setSearchParams({page:page.toString()})
-                } else {
-                    modal.setAuto(message,text);
-                }
-            })
-        })
-    }, [pagination.page,pagination.pageSize,renderTrigger]);
+        console.log('Fetch Effect');
+        fetch
+            .get(`/board/list/${pagination.page}/${pagination.pageSize}`)
+            .then((result) => {
+                const { text, data, message } = result;
+                fetch.resultHandler(result, () => {
+                    setData(data);
+                    if (data.length > 0) {
+                        const { page, pageSize, totalPage } = data[0];
+                        setPagination({
+                            pageSize,
+                            totalPage,
+                            page,
+                        });
+                        navigate(`/board/${page}`);
+                    } else {
+                        modal.setAuto('글이 없어요!', '첫번째 글을 작성해주세요.',()=>{
+                            handlePost();
+                        });
+
+                    }
+                });
+            });
+    }, [pagination.page, pagination.pageSize, renderTrigger]);
     const handlePrev = () => {
         setPagination((prev) => {
-            const { page:prevPage, totalPage } = prev;
+            const { page: prevPage, totalPage } = prev;
             const page = Math.max(prevPage - BOTTOM_SIZE, 1);
-            const firstNumber = Math.floor((page - 1) / BOTTOM_SIZE) * BOTTOM_SIZE + 1;
-            const lastNumber = Math.min(firstNumber + BOTTOM_SIZE - 1, totalPage);
-            const currentPage = Math.floor(Math.max((prevPage - 1),1) / BOTTOM_SIZE ) === 0 ? 1 : lastNumber;
+            const firstNumber =
+                Math.floor((page - 1) / BOTTOM_SIZE) * BOTTOM_SIZE + 1;
+            const lastNumber = Math.min(
+                firstNumber + BOTTOM_SIZE - 1,
+                totalPage,
+            );
+            const currentPage =
+                Math.floor(Math.max(prevPage - 1, 1) / BOTTOM_SIZE) === 0
+                    ? 1
+                    : lastNumber;
             return {
                 ...prev,
                 page: currentPage,
@@ -59,12 +76,13 @@ export default function BoardForm() {
     };
     const handleNext = () => {
         setPagination((prev) => {
-            const { page:prevPage, totalPage } = prev;
+            const { page: prevPage, totalPage } = prev;
             const page = Math.min(prevPage + BOTTOM_SIZE, totalPage);
             const firstNumber = page - (page % BOTTOM_SIZE) + 1;
             // const lastNumber = Math.min(firstNumber + BOTTOM_SIZE - 1, totalPage);
             let currentPage = Math.min(firstNumber, page);
-            currentPage = totalPage - prevPage < BOTTOM_SIZE ? totalPage : currentPage;
+            currentPage =
+                totalPage - prevPage < BOTTOM_SIZE ? totalPage : currentPage;
             return {
                 ...prev,
                 page: currentPage,
@@ -97,20 +115,36 @@ export default function BoardForm() {
     const renderOptions = useCallback(() => {
         return [...new Array(6)].map((_, index) => {
             return (
-                <React.Fragment key={index}>
+                <Fragment key={index}>
                     <option value={(index + 1) * PAGE_SIZE_MULTIPLE_VALUE}>
                         {(index + 1) * PAGE_SIZE_MULTIPLE_VALUE}
                     </option>
-                </React.Fragment>
+                </Fragment>
             );
         });
     }, []);
+    const handlePost = useCallback(()=>{
+        navigate('/board/post');
+    },[])
     if (loading) return <Spinner />;
     return (
         <>
             <div className={'container mx-auto'}>
                 <div className={'flex items-baseline'}>
-                    <BoardInput setRenderTrigger={setRenderTrigger}/>
+                    <div
+                        className={
+                            'container mx-auto flex py-2 items-center space-x-3'
+                        }
+                    >
+                        <button
+                            className={
+                                'bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow'
+                            }
+                            onClick={handlePost}
+                        >
+                            글쓰기
+                        </button>
+                    </div>
                     <select
                         className={
                             'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'

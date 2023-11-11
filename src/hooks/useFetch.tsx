@@ -1,11 +1,11 @@
 import { useCallback, useContext, useMemo, useState } from 'react';
-import { ModalContext } from '../router/AppRouter';
+import {ContextStorage} from '../router/AppRouter';
 import { useNavigate } from 'react-router-dom';
 
 const PREFIX = process.env.REACT_APP_API_URL;
 const SERVER_ERROR_MESSAGE = 'INTERNAL_SERVER_ERROR';
 export default function useFetch() {
-    const modal = useContext(ModalContext);
+    const {modal} = useContext(ContextStorage);
     const navigate = useNavigate();
     const [jwt, setJwt] = useState<Jwt>((): Jwt => {
         const key = sessionStorage.getItem('key') || '{}';
@@ -35,16 +35,12 @@ export default function useFetch() {
 
     const post = useCallback(
         async (url: string, body?: object) => {
-            try {
-                const response = await fetch(PREFIX + url, {
-                    ...defaultHeaders,
-                    method: 'POST',
-                    body: JSON.stringify(body),
-                });
-                return await response.json();
-            } catch (e:any){
-                modal.setAuto(SERVER_ERROR_MESSAGE,e.stack);
-            }
+            const response = await fetch(PREFIX + url, {
+                ...defaultHeaders,
+                method: 'POST',
+                body: JSON.stringify(body),
+            });
+            return await response.json();
         },
         [defaultHeaders],
     );
@@ -60,7 +56,6 @@ export default function useFetch() {
                     break;
                 case 401 :
                     modal.setAuto(message,text,()=>{
-                        modal.close();
                         navigate('/sign/in');
                     });
                     break;

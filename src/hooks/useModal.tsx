@@ -28,7 +28,10 @@ export default function useModal(): ModalReturnProps {
                 title,
                 content,
                 isOpen: true,
-                onClose : onClose ?? close
+                onClose : () => {
+                    close();
+                    onClose?.();
+                }
             }));
         },
         [],

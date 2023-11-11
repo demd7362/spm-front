@@ -2,14 +2,14 @@ import {useCallback, useContext, useEffect, useRef, useState} from 'react';
 import { Editor, Monaco } from '@monaco-editor/react';
 import { useQuery } from '@tanstack/react-query';
 import useFetch from '../hooks/useFetch';
-import {ModalContext} from "../router/AppRouter";
+import {ContextStorage} from "../router/AppRouter";
 import Spinner from "../components/common/Spinner";
 
 export default function Quiz() {
     const editorRef = useRef<Monaco | null>(null);
     const [quizInfo, setQuizInfo] = useState<QuizInfo | null>(null);
     const fetch = useFetch();
-    const modal = useContext(ModalContext);
+    const {modal} = useContext(ContextStorage);
     useEffect(() => {
         fetch.get(`/quiz/list/2`)
             .then(result => {

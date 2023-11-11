@@ -1,4 +1,4 @@
-import {Dispatch, MouseEventHandler, SetStateAction} from 'react';
+import React, {Dispatch, MouseEventHandler, ReactElement, SetStateAction} from 'react';
 declare global {
     type UserInfo = {
         uiNum?: number;
@@ -100,5 +100,15 @@ declare global {
         close: (callback?:()=>void) => void;
         setAuto: (title: string, content: string, onClose?:() => void) => void;
     };
+
+    interface ModalContext extends ModalReturnProps {
+
+    }
+
+    interface HeaderContext {
+        menu: ReactElement;
+        setMenu: Dispatch<SetStateAction<ReactElement>>;
+        setDefault: () => void;
+    }
 }
 
