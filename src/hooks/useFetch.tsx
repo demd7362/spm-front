@@ -1,11 +1,11 @@
 import { useCallback, useContext, useMemo, useState } from 'react';
-import {ContextStorage} from '../router/AppRouter';
+import { ContextStorage } from '../router/AppRouter';
 import { useNavigate } from 'react-router-dom';
 
 const PREFIX = process.env.REACT_APP_API_URL;
 const SERVER_ERROR_MESSAGE = 'INTERNAL_SERVER_ERROR';
 export default function useFetch() {
-    const {modal} = useContext(ContextStorage);
+    const { modal } = useContext(ContextStorage);
     const navigate = useNavigate();
     const [jwt, setJwt] = useState<Jwt>((): Jwt => {
         const key = sessionStorage.getItem('key') || '{}';
@@ -21,50 +21,69 @@ export default function useFetch() {
         [jwt.grantType, jwt.accessToken],
     );
 
+    const authenticate = useCallback(async (successCallback?: () => void) => {
+        const result = await get('/auth/validate');
+        resultHandler(result, successCallback);
+    }, []);
+
     const get = useCallback(
         async (url: string) => {
-            try {
-                const response = await fetch(PREFIX + url, defaultHeaders);
-                return await response.json();
-            } catch (e:any){
-                modal.setAuto(SERVER_ERROR_MESSAGE,e.stack);
-            }
+            const response = await fetch(PREFIX + url, defaultHeaders);
+            return await response.json();
         },
         [defaultHeaders],
     );
 
-    const post = useCallback(
-        async (url: string, body?: object) => {
+    const request = useCallback(
+        async (url: string, method: string,body?: object) => {
             const response = await fetch(PREFIX + url, {
                 ...defaultHeaders,
-                method: 'POST',
+                method,
                 body: JSON.stringify(body),
             });
             return await response.json();
         },
         [defaultHeaders],
     );
+    const post = useCallback(
+        async (url: string,body?: object) => {
+            return await request(url, 'POST', body);
+        },
+        [request],
+    );
+    const patch = useCallback(
+        async (url: string,body?: object) => {
+            return await request(url, 'PATCH', body);
+        },
+        [request],
+    );
+    const $delete = useCallback(
+        async (url: string,body?: object) => {
+            return await request(url, 'DELETE', body);
+        },
+        [request],
+    );
 
     const resultHandler = useCallback(
         (
             { text, status, message, response, data }: FetchResult,
-            callback?: (data?:any) => void,
+            successCallback?: (data?: any) => void,
         ) => {
-            switch(status){
-                case 200 :
-                    callback?.(data);
+            switch (status) {
+                case 200:
+                    successCallback?.(data);
                     break;
-                case 401 :
-                    modal.setAuto(message,text,()=>{
+                case 401:
+                    modal.setAuto(message, text, () => {
                         navigate('/sign/in');
                     });
                     break;
-                default :
-                    modal.setAuto(message,text);
+                default:
+                    modal.setAuto(message, text);
             }
         },
-        []
+        [],
     );
 
-    return { get, post, jwt, resultHandler };
+    return { get, post,patch,$delete, jwt, resultHandler, authenticate};
 }

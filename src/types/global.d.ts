@@ -23,8 +23,9 @@ declare global {
     };
     type BoardInfo = {
         biNum?: number;
-        biId: string;
+        biId?: string;
         biContent: string;
+        biTitle: string;
         biCreated?: string;
         biChanged?: string;
         biActive?: number;
@@ -75,9 +76,9 @@ declare global {
     };
     type PaginationProps = {
         pagination: Pagination;
-        handlePrev: () => void;
-        handleNext: () => void;
-        handleClickPage: (page: number) => void;
+        handlePrev(): void;
+        handleNext(): void;
+        handleClickPage(page: number): void;
         prevText?: string;
         nextText?: string;
         bottomSize: number;
@@ -88,7 +89,9 @@ declare global {
         content: string;
         isOpen?: boolean;
         closeText?: string;
-        onClose?: () => void;
+        onClose(): void;
+        onConfirm?(): void;
+        confirmText?: string;
     };
 
 
@@ -96,9 +99,10 @@ declare global {
     type ModalReturnProps = {
         props: UseModalProps;
         setProps: Dispatch<SetStateAction<UseModalProps>>;
-        open: () => void;
-        close: (callback?:()=>void) => void;
-        setAuto: (title: string, content: string, onClose?:() => void) => void;
+        open(): void;
+        close(callback?:()=>void): void;
+        setAuto(title: string, content: string, onClose?:() => void): void;
+        confirm(title: string, content: string, onConfirm: () => void,onClose?: () => void): void;
     };
 
     interface ModalContext extends ModalReturnProps {
@@ -108,7 +112,7 @@ declare global {
     interface HeaderContext {
         menu: ReactElement;
         setMenu: Dispatch<SetStateAction<ReactElement>>;
-        setDefault: () => void;
+        setDefault(): void;
     }
 }
 

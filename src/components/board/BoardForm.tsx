@@ -14,19 +14,17 @@ import { useNavigate, useParams } from 'react-router-dom';
 import {ContextStorage} from '../../router/AppRouter';
 
 const BOTTOM_SIZE = 5;
-const PAGE_SIZE_MULTIPLE_VALUE = 5;
+const PAGE_SIZE_MULTIPLE_VALUE = 20;
 
 export default function BoardForm() {
     const params = useParams();
     const navigate = useNavigate();
-    const {modal} = useContext(ContextStorage);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [renderTrigger, setRenderTrigger] = useState<number>(0);
     const fetch = useFetch();
+    const [loading, setLoading] = useState<boolean>(false);
     const [data, setData] = useState<BoardInfo[]>([]);
     const [pagination, setPagination] = useState<Paginations>({
         page: Number(params.page || '1'),
-        pageSize: 5,
+        pageSize: PAGE_SIZE_MULTIPLE_VALUE,
         totalPage: 1,
     });
     useEffect(() => {
@@ -34,10 +32,9 @@ export default function BoardForm() {
         fetch
             .get(`/board/list/${pagination.page}/${pagination.pageSize}`)
             .then((result) => {
-                const { text, data, message } = result;
-                fetch.resultHandler(result, () => {
-                    setData(data);
+                fetch.resultHandler(result, (data) => {
                     if (data.length > 0) {
+                        setData(data);
                         const { page, pageSize, totalPage } = data[0];
                         setPagination({
                             pageSize,
@@ -45,15 +42,10 @@ export default function BoardForm() {
                             page,
                         });
                         navigate(`/board/${page}`);
-                    } else {
-                        modal.setAuto('글이 없어요!', '첫번째 글을 작성해주세요.',()=>{
-                            handlePost();
-                        });
-
                     }
                 });
             });
-    }, [pagination.page, pagination.pageSize, renderTrigger]);
+    }, [pagination.page, pagination.pageSize]);
     const handlePrev = () => {
         setPagination((prev) => {
             const { page: prevPage, totalPage } = prev;
@@ -113,7 +105,7 @@ export default function BoardForm() {
     );
 
     const renderOptions = useCallback(() => {
-        return [...new Array(6)].map((_, index) => {
+        return [...new Array(5)].map((_, index) => {
             return (
                 <Fragment key={index}>
                     <option value={(index + 1) * PAGE_SIZE_MULTIPLE_VALUE}>
@@ -123,10 +115,14 @@ export default function BoardForm() {
             );
         });
     }, []);
-    const handlePost = useCallback(()=>{
+    const handlePost = useCallback(async ()=> {
+        await fetch.authenticate();
         navigate('/board/post');
     },[])
-    if (loading) return <Spinner />;
+    const handleClickPost = (biNum:number) => {
+        navigate(`/board/view/${biNum}`);
+    }
+    if (loading) return <Spinner/>
     return (
         <>
             <div className={'container mx-auto'}>
@@ -162,18 +158,20 @@ export default function BoardForm() {
                             className={'bg-gray-800 text-white py-2 px-4'}
                             key={row.biNum}
                         >
-                            <div className={'text-left py-3 px-4'}>
+                            <span className={'text-left py-3 px-4'}>
                                 #{row.biNum}
-                            </div>
-                            <div className={'text-left py-3 px-4'}>
+                            </span>
+                            <span className={'text-left py-3 px-4'}>
                                 ID : {row.biId}
-                            </div>
-                            <div className={'text-left py-3 px-4'}>
-                                &gt; {row.biContent}
-                            </div>
-                            <div
+                            </span>
+                            <span className={'text-left py-3 px-4 cursor-pointer hover:text-xl'} onClick={()=>{
+                                handleClickPost(row?.biNum ?? 1);
+                            }}>
+                                &gt; {row.biTitle}
+                            </span>
+                            <span
                                 className={'text-left py-3 px-4'}
-                            >{`${years}년 ${months}월 ${days}일 ${hours}시 ${minutes}분`}</div>
+                            >{`${years}년 ${months}월 ${days}일 ${hours}시 ${minutes}분`}</span>
                         </div>
                     );
                 })}

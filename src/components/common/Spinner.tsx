@@ -1,11 +1,12 @@
 import { ClipLoader } from 'react-spinners';
 import { CSSProperties, useState } from 'react';
 
-const override: CSSProperties = {
-
-};
+type SpinnerProps = {
+    loading: boolean
+}
 
 export default function Spinner() {
+
     return (
         <div className="flex justify-center items-center h-screen">
             <ClipLoader />

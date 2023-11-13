@@ -1,4 +1,4 @@
-import {useCallback, useContext, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useRef, useState} from 'react';
 import { Editor, Monaco } from '@monaco-editor/react';
 import { useQuery } from '@tanstack/react-query';
 import useFetch from '../hooks/useFetch';
@@ -7,15 +7,14 @@ import Spinner from "../components/common/Spinner";
 
 export default function Quiz() {
     const editorRef = useRef<Monaco | null>(null);
-    const [quizInfo, setQuizInfo] = useState<QuizInfo | null>(null);
+    const [data, setData] = useState<QuizInfo | null>(null);
     const fetch = useFetch();
     const {modal} = useContext(ContextStorage);
     useEffect(() => {
         fetch.get(`/quiz/list/2`)
             .then(result => {
                 fetch.resultHandler(result,(data:QuizInfo)=> {
-                    setQuizInfo(data);
-                    console.log(quizInfo)
+                    setData(data);
                 });
             })
     }, []);
@@ -25,15 +24,15 @@ export default function Quiz() {
     };
     const runCode = useCallback(()=>{
         try {
-            if(!quizInfo) return;
+            if(!data) return;
             // @ts-ignore
             const code = editorRef.current.getValue();
             const start = +new Date();
-            let result = new Function(code + `return runtime(${quizInfo.qiParam})`)();
+            let result = new Function(code + `return runtime(${data.qiParam})`)();
             result = JSON.stringify(result);
             const end = +new Date();
             const durationTime: number = end - start;
-            const answer = quizInfo.qiAnswer.replaceAll(' ','');
+            const answer = data.qiAnswer.replaceAll(' ','');
             const compareString = (arg1:string,arg2:string) => {
                 arg1 = arg1
                     .replaceAll(' ','')
@@ -50,17 +49,17 @@ export default function Quiz() {
             modal.setAuto('SYNTAX_ERROR_HAS_OCCURRED',e.stack);
         }
 
-    },[quizInfo])
+    },[data])
     const renderQuiz = useCallback(()=>{
         // @ts-ignore
-        const {qiContent,qiTitle,qiId,qiNum,qiParam}:QuizInfo = quizInfo;
+        const {qiContent,qiTitle,qiId,qiNum,qiParam}:QuizInfo = data;
         return (
             <p className={'font-bold text-black whitespace-pre-wrap'}>
                 {`${qiNum}번 문제\n제목 : ${qiTitle}\n출제자 : ${qiId}\n문제 : ${qiContent.split('.').join('.\n')}다음과 같은 파라미터가 주어진다고 가정합니다.\n${qiParam}`}
             </p>
         )
-    },[quizInfo])
-    if(quizInfo === null) return <Spinner/>
+    },[data])
+    if(!data) return <Spinner/>
     return (
         <div className={'flex justify-center h-90vh mt-5'}>
             <div className={'border-black w-1/2'}>

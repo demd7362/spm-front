@@ -10,16 +10,21 @@ import Quiz from '../pages/Quiz';
 import Modal from '../components/common/Modal';
 import useModal from '../hooks/useModal';
 import BoardPost from '../components/board/BoardPost';
+import BoardView from "../components/board/BoardView";
+import Spinner from "../components/common/Spinner";
+import useFetch from "../hooks/useFetch";
 
 const ModalDefaultValue: ModalContext = {
     props: {
         title: '',
         content: '',
+        onClose: () => {}
     },
     setProps: () => {},
     open: () => {},
     close: () => {},
     setAuto: (arg1, arg2) => {},
+    confirm: (arg1,arg2,arg3) => {}
 };
 const HeaderDefaultValue: HeaderContext = {
     menu: <></>,
@@ -50,11 +55,13 @@ export default function AppRouter() {
                 header: {menu,setMenu,setDefault}
             }}>
                 <Modal {...modal.props}/>
+
                 <Header />
                 <Routes>
                     <Route path="/" element={<Main />} />
                     <Route path="/board/:page" element={<Board />}/>
                     <Route path="/board/post" element={<BoardPost />} />
+                    <Route path="/board/view/:num" element={<BoardView/>}/>
                     <Route path="quiz" element={<Quiz />} />
                     <Route path="sign/in" element={<SignIn />} />
                     <Route path="sign/up" element={<SignUp />} />

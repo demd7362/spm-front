@@ -3,15 +3,17 @@ import { useEffect } from 'react';
 export default function Modal({
     title,
     content,
-    closeText = '확인',
+    closeText,
     isOpen,
     onClose,
+    onConfirm,
+    confirmText,
 }: UseModalProps) {
     useEffect(() => {
         console.log('Modal Effect');
-        function handleKeyDown(event: KeyboardEvent) {
+        const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Enter') {
-                onClose?.();
+                onClose();
             }
         }
 
@@ -21,7 +23,7 @@ export default function Modal({
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [title, content, onClose]);
+    }, [title, content, onClose, onConfirm]);
     if (!isOpen) return null;
 
     return (
@@ -73,10 +75,19 @@ export default function Modal({
                             >
                                 {closeText}
                             </button>
+                            {confirmText && (
+                                <button
+                                    onClick={onConfirm}
+                                    type="button"
+                                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                                >
+                                    {confirmText}
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     );
-};
+}

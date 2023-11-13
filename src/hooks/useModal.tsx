@@ -5,6 +5,7 @@ export default function useModal(): ModalReturnProps {
         title: '',
         content: '',
         isOpen: false,
+        onClose: () => {}
     });
 
     const open = useCallback(() => {
@@ -31,11 +32,31 @@ export default function useModal(): ModalReturnProps {
                 onClose : () => {
                     close();
                     onClose?.();
-                }
+                },
+                closeText: '확인'
             }));
         },
         [],
     );
+
+    const confirm = useCallback((title:string,content:string,onConfirm: () => void, onClose?: () => void)=> {
+        setProps((prev) => ({
+            ...prev,
+            title,
+            content,
+            isOpen: true,
+            onClose: () => {
+                close();
+                onClose?.();
+            },
+            onConfirm: () => {
+                close();
+                onConfirm();
+            },
+            closeText: '취소',
+            confirmText: '확인'
+        }));
+    },[])
 
     return {
         props,
@@ -43,5 +64,6 @@ export default function useModal(): ModalReturnProps {
         open,
         close,
         setAuto,
+        confirm,
     };
 }
